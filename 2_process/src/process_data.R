@@ -8,6 +8,7 @@ library(whisker)
 
 # Prepare the data for plotting
 process_data <- function(data){ 
+  dir.create('2_process/out/')
   readr::read_csv(data, col_types = 'iccd') %>%
   #data %>%
   filter(str_detect(exper_id, 'similar_[0-9]+')) %>%
