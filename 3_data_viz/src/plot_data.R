@@ -1,7 +1,7 @@
-plot_data <- function(eval_data){
+plot_data <- function(eval_data, colors, markers, out_path, plot_dim){
   dir.create('3_data_viz/out/')
   # Create a plot
-  png(file = file.path('3_data_viz/out/', 'figure_1.png'), width = 8, height = 10, res = 200, units = 'in')
+  png(file = out_path, width = plot_dim[1], height = plot_dim[2], res = 200, units = 'in')
   par(omi = c(0,0,0.05,0.05), mai = c(1,1,0,0), las = 1, mgp = c(2,.5,0), cex = 1.5)
   
   plot(NA, NA, xlim = c(2, 1000), ylim = c(4.7, 0.75),
@@ -32,13 +32,13 @@ plot_data <- function(eval_data){
     
   }
   
-  points(2.2, 0.79, col = '#7570b3', pch = 23, bg = 'white', lwd = 2.5, cex = 1.5)
+  points(2.2, 0.79, col = colors[1], pch = markers[1], bg = 'white', lwd = 2.5, cex = 1.5)
   text(2.3, 0.80, 'Process-Guided Deep Learning', pos = 4, cex = 1.1)
   
-  points(2.2, 0.94, col = '#d95f02', pch = 22, bg = 'white', lwd = 2.5, cex = 1.5)
+  points(2.2, 0.94, col = colors[2], pch = markers[2], bg = 'white', lwd = 2.5, cex = 1.5)
   text(2.3, 0.95, 'Deep Learning', pos = 4, cex = 1.1)
   
-  points(2.2, 1.09, col = '#1b9e77', pch = 21, bg = 'white', lwd = 2.5, cex = 1.5)
+  points(2.2, 1.09, col = colors[3], pch = markers[3], bg = 'white', lwd = 2.5, cex = 1.5)
   text(2.3, 1.1, 'Process-Based', pos = 4, cex = 1.1)
   
   dev.off()

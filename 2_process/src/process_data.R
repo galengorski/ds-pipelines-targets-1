@@ -1,5 +1,6 @@
 
 library(dplyr)
+library(tidyr)
 library(readr)
 library(stringr)
 library(whisker)
@@ -29,22 +30,50 @@ save_proc_data <- function(eval_data){
 readr::write_csv(eval_data, file = file.path('2_process/out/', 'model_summary_results.csv'))
 }
 
-# Save the model diagnostics
-save_model_diag <- function(eval_data){
-render_data <- list(pgdl_980mean = filter(eval_data, model_type == 'pgdl', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
-                    dl_980mean = filter(eval_data, model_type == 'dl', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
-                    pb_980mean = filter(eval_data, model_type == 'pb', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
-                    dl_500mean = filter(eval_data, model_type == 'dl', exper_id == "similar_500") %>% pull(rmse) %>% mean %>% round(2),
-                    pb_500mean = filter(eval_data, model_type == 'pb', exper_id == "similar_500") %>% pull(rmse) %>% mean %>% round(2),
-                    dl_100mean = filter(eval_data, model_type == 'dl', exper_id == "similar_100") %>% pull(rmse) %>% mean %>% round(2),
-                    pb_100mean = filter(eval_data, model_type == 'pb', exper_id == "similar_100") %>% pull(rmse) %>% mean %>% round(2),
-                    pgdl_2mean = filter(eval_data, model_type == 'pgdl', exper_id == "similar_2") %>% pull(rmse) %>% mean %>% round(2),
-                    pb_2mean = filter(eval_data, model_type == 'pb', exper_id == "similar_2") %>% pull(rmse) %>% mean %>% round(2))
+# custom filter function
+filter_data_for_render <- function(eval_data, model_types, exper_ids){
 
-template_1 <- 'resulted in mean RMSEs (means calculated as average of RMSEs from the five dataset iterations) of {{pgdl_980mean}}, {{dl_980mean}}, and {{pb_980mean}}°C for the PGDL, DL, and PB models, respectively.
+#concat model type and exper id for filtering
+mdl_typ_exp_id <- paste(model_types, exper_ids, sep = '_')
+
+#create a filtered dataframe with the desired model runs and their mean rmse values
+filtered_data_df <- eval_data %>%
+  group_by(model_type, exper_id) %>%
+  summarise(mean_rmse = round(mean(rmse),2)) %>%
+  mutate(mdl_typs_exp_ids = paste(model_type, exper_id, sep = '_')) %>%
+  filter(mdl_typs_exp_ids %in% mdl_typ_exp_id) %>%
+  #clean up model identifiers
+  separate(mdl_typs_exp_ids, c('A','B','C'),sep = '_') %>%
+  mutate(model_type_exper_id = paste(A,C,sep = '_')) %>%
+  ungroup() %>%
+  select(model_type_exper_id, mean_rmse)
+
+
+#convert tibble to named list for rendering
+filtered_data_list <- as.list(filtered_data_df$mean_rmse) 
+names(filtered_data_list) <- filtered_data_df$model_type_exper_id
+
+return(filtered_data_list)
+}
+
+
+# Save the model diagnostics
+save_model_diag <- function(eval_data, model_types, exper_ids){
+# render_data <- list(pgdl_980mean = filter(eval_data, model_type == 'pgdl', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
+#                     dl_980mean = filter(eval_data, model_type == 'dl', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
+#                     pb_980mean = filter(eval_data, model_type == 'pb', exper_id == "similar_980") %>% pull(rmse) %>% mean %>% round(2),
+#                     dl_500mean = filter(eval_data, model_type == 'dl', exper_id == "similar_500") %>% pull(rmse) %>% mean %>% round(2),
+#                     pb_500mean = filter(eval_data, model_type == 'pb', exper_id == "similar_500") %>% pull(rmse) %>% mean %>% round(2),
+#                     dl_100mean = filter(eval_data, model_type == 'dl', exper_id == "similar_100") %>% pull(rmse) %>% mean %>% round(2),
+#                     pb_100mean = filter(eval_data, model_type == 'pb', exper_id == "similar_100") %>% pull(rmse) %>% mean %>% round(2),
+#                     pgdl_2mean = filter(eval_data, model_type == 'pgdl', exper_id == "similar_2") %>% pull(rmse) %>% mean %>% round(2),
+#                     pb_2mean = filter(eval_data, model_type == 'pb', exper_id == "similar_2") %>% pull(rmse) %>% mean %>% round(2))
+
+render_data <- filter_data_for_render(eval_data, model_types, exper_ids)
+template_1 <- 'resulted in mean RMSEs (means calculated as average of RMSEs from the five dataset iterations) of {{pgdl_980}}, {{dl_980}}, and {{pb_980}}°C for the PGDL, DL, and PB models, respectively.
   The relative performance of DL vs PB depended on the amount of training data. The accuracy of Lake Mendota temperature predictions from the DL was better than PB when trained on 500 profiles 
-  ({{dl_500mean}} and {{pb_500mean}}°C, respectively) or more, but worse than PB when training was reduced to 100 profiles ({{dl_100mean}} and {{pb_100mean}}°C respectively) or fewer.
-  The PGDL prediction accuracy was more robust compared to PB when only two profiles were provided for training ({{pgdl_2mean}} and {{pb_2mean}}°C, respectively). '
+  ({{dl_500}} and {{pb_500}}°C, respectively) or more, but worse than PB when training was reduced to 100 profiles ({{dl_100}} and {{pb_100}}°C respectively) or fewer.
+  The PGDL prediction accuracy was more robust compared to PB when only two profiles were provided for training ({{pgdl_2}} and {{pb_2}}°C, respectively). '
 
 whisker.render(template_1 %>% str_remove_all('\n') %>% str_replace_all('  ', ' '), render_data ) %>% cat(file = file.path('2_process/out/', 'model_diagnostic_text.txt'))
 
