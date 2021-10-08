@@ -20,19 +20,16 @@ list(
   tar_target(
     figure_1_png,
     plot_data(eval_data, colors = c('#7570b3','#d95f02','#1b9e77'), markers = c(23,22,21), 
-              out_path = '3_data_viz/out/figure_1.png', plot_dim = c(8,10)), 
-    format = "file"
+              out_path = '3_data_viz/out/figure_1.png', plot_dim = c(8,10))
   ),
   # Save the processed data
   tar_target(
     model_summary_results_csv,
-    save_proc_data(eval_data), 
-    format = "file"
+    save_proc_data(eval_data)
   ),
   # Save the model diagnostics
   tar_target(
     model_diagnostic_text_txt,
-    save_model_diag(eval_data),
-    format = "file"
+    save_model_diag(eval_data)
   )
 )
