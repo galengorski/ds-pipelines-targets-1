@@ -9,7 +9,7 @@ library(whisker)
 
 # Prepare the data for plotting
 process_data <- function(data){ 
-  dir.create('2_process/out/')
+  dir.create('2_process/out/', showWarnings = FALSE)
   readr::read_csv(data, col_types = 'iccd') %>%
   #data %>%
   filter(str_detect(exper_id, 'similar_[0-9]+')) %>%
@@ -31,8 +31,14 @@ readr::write_csv(eval_data, file = file.path('2_process/out/', 'model_summary_re
 }
 
 # custom filter function
-filter_data_for_render <- function(eval_data, model_types, exper_ids){
+filter_data_for_render <- function(eval_data){
 
+#define models we're interested in saving
+model_types <- c('pgdl','dl','pb','dl','pb','dl','pb','pgdl','pb')
+exper_ids <- c('similar_980','similar_980','similar_980','similar_500',
+                 'similar_500','similar_100','similar_100','similar_2','similar_2')
+  
+  
 #concat model type and exper id for filtering
 mdl_typ_exp_id <- paste(model_types, exper_ids, sep = '_')
 
@@ -58,8 +64,8 @@ return(filtered_data_list)
 
 
 # Save the model diagnostics
-save_model_diag <- function(eval_data, model_types, exper_ids){
-render_data <- filter_data_for_render(eval_data, model_types, exper_ids)
+save_model_diag <- function(eval_data){
+render_data <- filter_data_for_render(eval_data)
 template_1 <- 'resulted in mean RMSEs (means calculated as average of RMSEs from the five dataset iterations) of {{pgdl_980}}, {{dl_980}}, and {{pb_980}}°C for the PGDL, DL, and PB models, respectively.
   The relative performance of DL vs PB depended on the amount of training data. The accuracy of Lake Mendota temperature predictions from the DL was better than PB when trained on 500 profiles 
   ({{dl_500}} and {{pb_500}}°C, respectively) or more, but worse than PB when training was reduced to 100 profiles ({{dl_100}} and {{pb_100}}°C respectively) or fewer.
