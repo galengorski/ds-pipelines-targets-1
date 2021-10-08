@@ -1,5 +1,5 @@
 plot_data <- function(eval_data, colors, markers, out_path, plot_dim){
-  dir.create('3_data_viz/out/')
+  dir.create('3_data_viz/out/', showWarnings = FALSE)
   # Create a plot
   png(file = out_path, width = plot_dim[1], height = plot_dim[2], res = 200, units = 'in')
   par(omi = c(0,0,0.05,0.05), mai = c(1,1,0,0), las = 1, mgp = c(2,.5,0), cex = 1.5)
