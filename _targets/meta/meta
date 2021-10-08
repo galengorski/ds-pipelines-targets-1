@@ -1,0 +1,12 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|iteration|parent|children|seconds|warnings|error
+eval_data|stem|12eb3e5bcea652ba|486c655a1aeaf1b7|ce30d342c5fc06c5|342377258||t18908.5832188553s|00a5850ea2e19084|1278|rds|vector|||0.11||
+model_RMSEs_csv|stem|43b999a50fce98ef|9ab8bf6824545f33|20d5d82eb7979bd7|-109284820|1_fetch/out/model_RMSEs.csv|t18908.5846437941s|5dda5f72d8edf133|4112|file|vector|||3.47||
+model_summary_results_csv|stem|12eb3e5bcea652ba|34ff3b7d0bb8d980|ccebb37561d0ecee|-1997167944||t18908.5884194105s|00a5850ea2e19084|1278|rds|vector|||0.65||
+figure_1_png|stem|7afce8d73a6ce592|580d4a08155195d1|2ef99d75c7ab9757|-1315804071||t18908.58872212s|25edcc1f7bb1c960|85|rds|vector|||0.83||
+model_diagnostic_text_txt|stem|7675c80b59ca7a4a|637d178d347c20a5|faa1eec3c371e1ff|-1271344417||t18908.5891141682s|3bd8f66805fd112b|45|rds|vector|||0.61||
+filter_data_for_render|function|9528342daa166cce||||||||||||||
+fetch_data|function|f8529a520dccb969||||||||||||||
+process_data|function|23300b8457fb1c76||||||||||||||
+plot_data|function|9c6a5847eae6f3ed||||||||||||||
+save_proc_data|function|1d9b54565e910f7c||||||||||||||
+save_model_diag|function|fd61d022bff67662||||||||||||||
